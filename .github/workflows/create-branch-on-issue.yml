@@ -1,0 +1,44 @@
+name: Create branch when issue moves to In Progress
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'In Progress')
+    steps:
+      - name: Set branch name
+        id: info
+        run: |
+          TITLE=$(echo "${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
+          NUMBER=${{ github.event.issue.number }}
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "number=$NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Create branch from main
+        run: |
+          BRANCH_NAME="issue-${{ steps.info.outputs.number }}-${{ steps.info.outputs.title }}"
+          echo "Creating branch: $BRANCH_NAME"
+
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} repo
+          cd repo
+
+          git fetch origin main
+          git checkout -b "$BRANCH_NAME" origin/main
+
+          if git ls-remote --exit-code --heads origin "$BRANCH_NAME"; then
+            echo "Branch já existe, pulando criação."
+            exit 0
+          fi
+
+          git push origin "$BRANCH_NAME"
+
