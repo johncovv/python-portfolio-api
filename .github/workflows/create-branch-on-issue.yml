@@ -1,5 +1,9 @@
 name: Create branch when Project item moves to In Progress
 
+permissions:
+  contents: write
+  issues: read
+
 on:
   issues:
     types: [edited, labeled]
