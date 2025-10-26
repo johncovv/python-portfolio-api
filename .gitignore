@@ -1,0 +1,8 @@
+# environment
+.env
+.vscode/
+!.vscode/launch.json
+
+# python
+__pycache__/
+.venv/
