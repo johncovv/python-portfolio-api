@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     port: int = 8000
     host: str = "0.0.0.0"
 
+    database_url: str = "sqlite+aiosqlite:///database.db"
+
     @property
     def is_development(self) -> bool:
         return self.environment == "development"

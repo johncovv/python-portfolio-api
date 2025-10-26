@@ -6,3 +6,7 @@
 # python
 __pycache__/
 .venv/
+
+# testing
+.coverage
+*.db

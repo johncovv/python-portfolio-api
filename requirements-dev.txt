@@ -1,0 +1,4 @@
+-r requirements.txt
+aiosqlite
+annotated-doc==0.0.3
+typing-inspection==0.4.2
