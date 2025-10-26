@@ -39,6 +39,10 @@ async def health_check():
     }
 
 
+from routes.project import router as project_router
+
+app.include_router(project_router)
+
 if __name__ == "__main__":
     import uvicorn
 
