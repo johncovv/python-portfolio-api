@@ -1,0 +1,27 @@
+name: Create branch when Project item moves to In Progress
+
+on:
+  issues:
+    types: [edited, labeled]
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    if: >
+      contains(github.event.issue.labels.*.name, 'in progress')
+    steps:
+      - name: Create branch from main
+        run: |
+          BRANCH_NAME=$(echo "${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git clone https://github.com/${{ github.repository }} repo
+          cd repo
+          git fetch origin main
+          git checkout -b "issue-${{ github.event.issue.number }}-${BRANCH_NAME}" origin/main
+          git push origin "issue-${{ github.event.issue.number }}-${BRANCH_NAME}"
+
