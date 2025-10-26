@@ -1,26 +1,25 @@
-name: Create branch when Project item moves to In Progress
+name: Create branch when issue moves to In Progress
 
 on:
-  projects_v2_item:
-    types: [edited, moved]
+  issues:
+    types: [labeled]
 
 permissions:
   contents: write
   issues: read
-  projects: read
 
 jobs:
   create_branch:
     runs-on: ubuntu-latest
-    if: |
-      github.event.changes.field_value &&
-      github.event.changes.field_value.new_value.name == 'In Progress'
+    if: contains(github.event.issue.labels.*.name, 'In Progress')
     steps:
-      - name: Get item info
+      - name: Set branch name
         id: info
         run: |
-          echo "title=$(echo "${{ github.event.projects_v2_item.content.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')" >> $GITHUB_OUTPUT
-          echo "number=${{ github.event.projects_v2_item.content.number }}" >> $GITHUB_OUTPUT
+          TITLE=$(echo "${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
+          NUMBER=${{ github.event.issue.number }}
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "number=$NUMBER" >> $GITHUB_OUTPUT
 
       - name: Create branch from main
         run: |
